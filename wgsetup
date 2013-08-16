@@ -1,0 +1,22 @@
+#!/bin/bash
+#$ -S /bin/bash
+
+#Written by Stav Yagev, 2013
+
+
+mkdir -p ~/.matlab/cluster_jobs/32g.q
+mkdir -p ~/.matlab/cluster_jobs/64g.q
+mkdir -p ~/.matlab/cluster_jobs/all.q
+mkdir -p ~/.matlab/cluster_jobs/anat10g.q
+mkdir -p ~/.matlab/cluster_jobs/anat128g.q
+mkdir -p ~/.matlab/cluster_jobs/anat32g.q
+mkdir -p ~/.matlab/cluster_jobs/anat64g.q
+mkdir -p ~/.matlab/cluster_jobs/anatall.q
+mkdir -p ~/.matlab/cluster_jobs/fast.q
+mkdir -p ~/.matlab/cluster_jobs/high.q
+mkdir -p ~/.matlab/cluster_jobs/yaronall.q
+
+chmod +x ~/WeizGrid/qsubWG
+chmod +x ~/WeizGrid/weizgrid
+chmod +x ~/WeizGrid/dowork
+chmod +x ~/WeizGrid/empty

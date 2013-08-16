@@ -1,0 +1,6 @@
+#!/bin/bash
+#$ -S /bin/bash
+
+#Written by Stav Yagev, 2013
+
+matlab2012a -nodisplay -r "load('~/.matlab/cluster_jobs/$1/$2_$3i'); if (bRngShuffle) rng('shuffle'); end; WGres = cell(krng(2)-krng(1)+1,1); bSuccess = zeros(krng(2)-krng(1)+1,1); for k=krng(1):krng(2) [WGres{k-krng(1)+1},bSuccess(k-krng(1)+1)] = $4(WGglobalParams,WGsubParams(k-krng(1)+1),k); end; save('~/.matlab/cluster_jobs/$1/$2_$3o','WGres','krng','bSuccess'); quit;"

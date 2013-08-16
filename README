@@ -1,0 +1,78 @@
+###############################################################################
+## WeizGrid
+##  By Stav Yagev, 2013 (Please contact me if you find bugs !)
+##
+## 
+## A simple framework for using the SGE cluster at Weizmann's CS department for parallel work.
+##
+## FEATURES:
+##  - Helps split your own code into fractions that can be run in parallel on the cluster.
+##  - Allows you to aggregate results in an efficient manner.
+##  - Write your code ONCE! Execute the same code on PC for debugging and on the cluster
+##      for production.
+##  - Recover from errors on the cluster - splitting means if 1 iteration out of a 
+##      1000 failed you still have 999 iterations in your hand!
+##
+## Use case example: 
+##  You have a job that processes 1000 images in some way, running the same algorithm 
+##  for each image, outputing something for each image, and finally aggregating the 
+##  results from all images. Up until now, you ran this in a single job that took 1000 
+##  minutes (because lets assume it takes 1 minute to process each image). Using WeizGrid 
+##  you can take advantage of the fact that the job can be parallelized - instead of 1
+##  job WeizGrid helps you easily split the job to 80 parallel jobs so that you get all 
+##  1000 images in 1000/80=12.5 minutes (!!)
+##
+
+
+Auto Installation:
+==================
+1. Copy all the UNIX scripts to ~/WeizGrid
+2. Copy the rest of the files where you want
+3. In a UNIX terminal, type:
+    chmod +x ~/WeizGrid/wgsetup
+4. Then type:
+    ~/WeizGrid/wgsetup
+
+Usage:
+======
+1. Create files in the spirit of 'sample.m' and 'calcPrimes.m'
+2. Upload them to UNIX
+3. To start a job, under UNIX, from the direcotry of YOUR project, run: 
+        ~/WeizGrid/qsubWG [name] [your-m-file] [queue]
+
+    Example: ~/WeizGrid/qsubWG ParallelCracker sample all.q
+
+4.  Enjoy!
+
+*** Check out sample.m and calcPrimes for a simple usage example! ***
+
+
+
+
+
+Manual Installation (if auto doesn't work...):
+=============================================
+1. Copy all the UNIX scripts to ~/WeizGrid.
+2. Copy the rest of the files where you want.
+3. Make sure all bash scripts have execute permission.
+4. Create the following directory structure (1 folder for each queue you intend to use):
+        ~/.matlab/cluster_jobs/all.q
+        ~/.matlab/cluster_jobs/test.q
+        ...
+    NOTE: The ~/.matlab/ usually already exists but is hidden, so make sure you 
+            are viewing hidden files and folders .
+
+
+
+
+Tips & Troubleshooting:
+=======================
+- If your algorithm uses a random number, make sure you are not setting the RngShuffle
+    option to false when invoking WGexec - because this will yield the same random
+    series for every "parallel" piece of work.
+- Sometimes, during the aggregation part of your script, there will be a bug. Then,
+    you might think all your work is lost! This is not the case, look into the documentation
+    of WGgetResults for more information.
+- There isn't verbose error checking, so if something doesn't work, check the output
+    files on your UNIX folder for hints... If still unsuccessful, feel free to contact 
+    me for help

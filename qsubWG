@@ -1,0 +1,20 @@
+#!/bin/bash
+#$ -S /bin/bash
+
+#Usage:   qsubWG [name] [m-file] [queue]
+#Example: qsubWG ParallelCracker sample all.q
+
+#Written by Stav Yagev, 2013
+
+
+
+#this cleans up temp files from previous jobs (all of this is optional)
+rm -f ~/.matlab/cluster_jobs/$1/*
+rm -f *.e*
+rm -f *.o*
+
+
+#this invokes the main job, if you decide to this yourself
+#make sure you include the -V and -cwd options when you qsub
+
+qsub -cwd -q $3 -V -N $1 ~/WeizGrid/weizgrid $2 $3
