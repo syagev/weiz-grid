@@ -3,7 +3,7 @@
 ##  By Stav Yagev, 2013 (Please contact me if you find bugs !)
 ##
 ## 
-## A simple framework for using the SGE cluster at Weizmann's CS department for parallel work.
+## Simple framework for using the SGE cluster on Weizmann for parallel work.
 ##
 ## FEATURES:
 ##  - Helps split your own code into fractions that can be run in parallel on the cluster.
@@ -26,25 +26,23 @@
 
 Auto Installation:
 ==================
-1. Copy all the UNIX scripts to ~/WeizGrid
-2. Copy the rest of the files where you want
-3. In a UNIX terminal, type:
+1. Copy all the files to ~/WeizGrid
+2. In a UNIX terminal, type:
     chmod +x ~/WeizGrid/wgsetup
-4. Then type:
+3. Then type:
     ~/WeizGrid/wgsetup
 
 Usage:
 ======
-1. Create files in the spirit of 'sample.m' and 'calcPrimes.m'
-2. Upload them to UNIX
-3. To start a job, under UNIX, from the direcotry of YOUR project, run: 
+1. Create files in the spirit of 'sample.m' and 'calcPrimes.m' (make sure 
+	the WG m-files are in MATLAB's path)
+2. Upload your files to UNIX
+3. Under UNIX, from the direcotry of YOUR project, run: 
         ~/WeizGrid/qsubWG [name] [your-m-file] [queue]
 
     Example: ~/WeizGrid/qsubWG ParallelCracker sample all.q
 
 4.  Enjoy!
-
-*** Check out sample.m and calcPrimes for a simple usage example! ***
 
 
 
@@ -52,10 +50,9 @@ Usage:
 
 Manual Installation (if auto doesn't work...):
 =============================================
-1. Copy all the UNIX scripts to ~/WeizGrid.
-2. Copy the rest of the files where you want.
-3. Make sure all bash scripts have execute permission.
-4. Create the following directory structure (1 folder for each queue you intend to use):
+1. Copy all files to ~/WeizGrid.
+2. Make sure all bash scripts have execute permission.
+2. Create the following directory structure (1 folder for each queue you intend to use):
         ~/.matlab/cluster_jobs/all.q
         ~/.matlab/cluster_jobs/test.q
         ...
@@ -71,8 +68,8 @@ Tips & Troubleshooting:
     option to false when invoking WGexec - because this will yield the same random
     series for every "parallel" piece of work.
 - Sometimes, during the aggregation part of your script, there will be a bug. Then,
-    you might think all your work is lost! This is not the case, look into the documentation
-    of WGgetResults for more information.
+    you might think all your work is lost! This is not the case, look into part #2
+    of the documentation of WGgetResults for more information.
 - There isn't verbose error checking, so if something doesn't work, check the output
-    files on your UNIX folder for hints... If still unsuccessful, feel free to contact 
-    me for help
+    files on your UNIX home for hints... If still unsuccessful, feel free to contact 
+    me for help.

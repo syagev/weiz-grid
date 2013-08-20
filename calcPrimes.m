@@ -1,23 +1,24 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % calcPrimes.m - Sample usage of WeizGrid
 %
-%   Together with 'smaple' this is a very simple example of 
+%   Together with 'sample' this is a very simple example of 
 %   using WeizGrid. 
 %
 %   In this example our main 'work' function takes 2 integers and finds
-%   common factors between them. It also accepts a 'global' parameter that
-%   determines whether to include the number 1 as a common factor.
+%   common factors between their average and a random number. It also accepts 
+%   a 'global' parameter that determines whether to include the number 1 as a 
+%   common factor.
 %   
 % By Stav Yagev, 2013
 
 
-function [WGres,bSuccess] = calcPrimes(WGglobalParam, WGsubParam, k)
+function [WGres,bSuccess] = calcPrimes(WGglobalParam, WGsubParam, j, k)
         
     %TODO: replace this with your own implementation code
-    fprintf('Processing iteration #%d\n',k);
+    fprintf('Processing iteration #%d of sub-parameters #%d\n',k,j);
     
-    f1 = factor(WGsubParam.X);
-    f2 = factor(WGsubParam.Y);
+    f1 = factor(mean(WGsubParam.X + WGsubParam.Y));
+    f2 = factor(randi(intmax,1));
     WGres = intersect(f1,f2);
 
     if (WGglobalParam.bCount1AsAFactor)

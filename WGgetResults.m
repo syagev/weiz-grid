@@ -1,18 +1,34 @@
 function [WGtotalRes, bTotalSuccess, nLost] = WGgetResults( WGjob, varargin )
 %WGgetResults Returns the aggregated results from a WG job.
 %   Call this function after a call to WGexec has finished and you want to
-%   do post processing with the results. This method has 2 modes, in the
-%   regular case (1-parameter only):
+%   do post processing with the results. This method takes 1 parameter
+%   'WGjob' and a couple of named options:
 %
-%   WGjob - The identifier returned from WGexec.
+%   Parameters:
+%       WGjob - The identifier returned from WGexec.
+%
+%   Named Options:
+%       'LocalFolder' (default: false) - if true recovery mode is enabled,
+%           see the description below.
+%       'Flatten' (default: false) - if true the results will be in a
+%           1-dimensional cell array (instead of 2). This is useful
+%           especially for cases where every sub-parameter set is tested
+%           only once.
 %
 %   Return values: 
-%       WGtotalRes - will be a cell array of size Kx1 (where K is
-%           the total number of iterations), and will contain the results of each
-%           iteration as returned by your work function.
+%       WGtotalRes - will be a cell array of size Jx1 (where J is
+%           the total number of sub-parameter sets), and each cell will be 
+%           another cell array of size Kx1 (where K is the total number of 
+%           iterations for the j'th sub-parameters set). So
+%           WGtotalRes{j}{k} will contain the results of the work function
+%           for sub-parameters set j and iteration k. 
+%
+%           If 'Flatten' is set to true, this will instead be a 1
+%           dimensional (J*K)x1 cell array
 %   
-%       bTotalSuccess - a boolean vector of size Kx1 where each entry
-%           corresponds to the success code returned by your work function.
+%       bTotalSuccess - has the same structure as WGtotalRes, except that 
+%           every entry is a boolean corresponding to the success code returned 
+%           by your work function.
 %
 %       nLost - the count of iterations that was lost to unknown errors.
 %           Suppose for example you had a 1000 iteration jobs split into 5 so that 
@@ -32,35 +48,47 @@ function [WGtotalRes, bTotalSuccess, nLost] = WGgetResults( WGjob, varargin )
 %   results again:
 %   
 %   WGjob - A structure constructed by YOU the following way:
-%       WGjob.k = should be the original total number of iterations
+%       WGjob.k = is a Jx1 vector containing the original k values for each
+%           sub-parameters set
 %       WGjob.nparallels = the original number of parallels the work was split into
 %       WGjob.sName = the exact name used for the original job
 %
 %   Also specifiy the option 'LocalFolder' with the path to where you put
-%   the files on your PC/
+%   the files on your PC.
 %
 %   Return values: exactly the same as in the regular case.
 %
 %
 %   Written by Stav Yagev, 2013
 
+    bLocalFolder = false;
+    bFlatten = false;
     
-    if (length(varargin) >= 2 && strcmp(varargin(1),'LocalFolder') ...
-            && ~isempty(varargin{2}))
-        bLocalFolder = true;
-        sLocalFolder = varargin{2};
-    else
-        bLocalFolder = false;
+    for i = 1 : 2 : length(varargin)
+        name = varargin{i};
+        value = varargin{i+1};
+        switch name
+            case 'LocalFolder'
+                bLocalFolder = true;
+                sLocalFolder = value;
+            case 'Flatten'
+                bFlatten = value;
+        end
     end
+    
+    
     
     if (~isfield(WGjob,'bLocalDebug'))
         WGjob.bLocalDebug = false;
     end
     if (bLocalFolder || ~WGjob.bLocalDebug)
         nLost = 0;
-        WGtotalRes{WGjob.k} = [];
-        bTotalSuccess(WGjob.k) = false;
+        nGood = 0;
         
+        WGtotalRes = cell(WGjob.j,1);
+        bTotalSuccess = cell(WGjob.j,1);
+        iTotalK = sum(WGjob.k);
+
         %collect results
         for i=1:WGjob.nparallels
             if (~bLocalFolder)
@@ -70,19 +98,31 @@ function [WGtotalRes, bTotalSuccess, nLost] = WGgetResults( WGjob, varargin )
                 fname = sprintf([sLocalFolder '\\%s_%do.mat'],WGjob.sName,i);
             end
             
+            for j = 1:WGjob.j
+                WGtotalRes{j} = cell(WGjob.k(j),1);
+                bTotalSuccess{j} = false(WGjob.k(j),1);
+            end
+            
             if (exist(fname, 'file'))
                 %load the sub-simulation job data
                 load(fname);
-                WGtotalRes(krng(1):krng(2)) = WGres;
-                bTotalSuccess(krng(1):krng(2)) = bSuccess;
+                
+                for iAss = 1:size(mAssRng,1)
+                    WGtotalRes{mAssRng(iAss,1)}{mAssRng(iAss,2)} = WGres{iAss}; %#ok<USENS>
+                    bTotalSuccess{mAssRng(iAss,1)}(mAssRng(iAss,2)) = bSuccess(iAss);
+                end
+                
+                nGood = nGood + size(mAssRng,1);
                 
             else
-                %caluclate the correct k-range
-                krng = [(i-1)*ceil(WGjob.k/WGjob.nparallels)+1 ...
-                    min(WGjob.k, i*ceil(WGjob.k/WGjob.nparallels))];
-                bTotalSuccess(krng(1):krng(2)) = false;
-                
-                nLost = nLost + krng(2)-krng(1)+1;
+                %calculate how many iterations this parallel had
+                nLost = nLost - (i-1)*ceil(iTotalK/WGjob.nparallels)+1 + ...
+                    min(iTotalK, i*ceil(iTotalK/WGjob.nparallels)) + 1;
+            end
+            
+            %less maybe enough due to rounding
+            if ((nGood + nLost) == iTotalK)
+                break;
             end
         end
     
@@ -90,6 +130,11 @@ function [WGtotalRes, bTotalSuccess, nLost] = WGgetResults( WGjob, varargin )
         WGtotalRes = WGjob.WGres;
         bTotalSuccess = WGjob.bSuccess;
 
+    end
+    
+    if (bFlatten)
+        WGtotalRes = cat(1,WGtotalRes{:});
+        bTotalSuccess = cat(1,bTotalSuccess{:});
     end
 
 end

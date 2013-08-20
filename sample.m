@@ -4,9 +4,10 @@
 %   Together with 'calcPrimes' this is a very simple example of 
 %   using WeizGrid. 
 %
-%   In this example we have 1000 different values for parameters
-%   X and Y, for each set of values we check which prime factors
-%   X and Y have in common.
+%   In this example we have 50 different values for parameters
+%   X and Y. For each set of values we run 50 tests which take
+%   the average of X and Y and check which prime factors the
+%   result has in common with a random integer.
 %   
 % By Stav Yagev, 2013
 
@@ -29,6 +30,9 @@ for i=1:length(WGsubParam)
     %TODO: change to your own set of parameters neccessery for each sub-iteration
     WGsubParam(i).X = randi(intmax,1);
     WGsubParam(i).Y = randi(intmax,1);
+    
+    %this tells WG grid to execute this specific set of sub-paramaters 20 times
+    WGsubParam(i).k = 20;
 end
 
 
@@ -37,6 +41,7 @@ end
 
 %TODO: replace 'calcPrimes' with your private work function, and change the
 %       rest of the parameters as you see fit
+tic;
 WGjob = WGexec('nparallels', 3, 'Name', 'ParallelCracker', ...
     'WorkFunc', 'calcPrimes', 'LocalDebug', false, 'GlobalParams', WGglobalParam, ...
     'SubParams', WGsubParam, 'RngShuffle', true, 'WaitTillFinished', true); 
@@ -49,34 +54,65 @@ WGjob = WGexec('nparallels', 3, 'Name', 'ParallelCracker', ...
 [WGresults, bSuccess] = WGgetResults(WGjob);    %right click on 'WGgetResults' for help
 
 %TODO: do whatever you want with the results
-disp('The following iterations succeeded:');
-goodResults = find(bSuccess)
-fprintf('And the result from iteration #%d is:\n',goodResults(1));
-WGresults{goodResults(1)}
+fprintf('Done in %d seconds\n',round(toc));
+
+bDone = false;
+for j = 1:length(WGresults)
+    for k = 1:length(WGresults{j})
+        if (bSuccess{j}(k))
+            fprintf('\nIteration #%d for sub-parameters set #%d succeeded!\n', k,j);
+
+            disp('And the result was:');
+            WGresults{j}{k}
+            
+            bDone = true;
+            break;
+        end
+    end
+    
+    if (bDone)
+        break;
+    end
+end
+
 
 
 
 %% Part 2: Recovering from failure %%%%%%%%%%%%%%%%%%%%%% 
 
-% %in case you hade a bug in your aggregation, then you might not have saved
-% %all the results from the different sub-works. To recover from this case
-% %copy all the files from the following UNIX directory to somewhere on your PC
-% %   ~/.matlab/cluster_jobs/yourq.q/
-% 
+%in case you hade a bug in your aggregation, then you might not have saved
+%all the results from the different sub-works. To recover from this case
+%copy all the files from the following UNIX directory to somewhere on your PC
+%   ~/.matlab/cluster_jobs/yourq.q/
+
 % sTempDir = 'S:\\Expendable\\Temp';   %this is where you saved the files
 % 
 % %call the get results (which will return immediatley) with the local
 % %option. We need to specify some extra information since the original job
 % %was lost
-% WGjob.k = 50;           %total number of iterations
-% WGjob.nparallels = 3;   %orignal number of parallels the job was split to
+% WGjob.k(1:length(WGsubParam)) = WGsubParam(:).k;    %the original k values for each sub-parameters set
+% WGjob.nparallels = 3;               %orignal number of parallels the job was split to
 % WGjob.sName = 'ParallelCracker';    %the original job's name
-% [WGresults, bSuccess] = WGgetResults(WGjob, 'LocalFolder', sTempDir, ...
-%     'nparallels',3,'TotalIterations',50);
+% [WGresults, bSuccess, nLost] = WGgetResults(WGjob, 'LocalFolder', sTempDir);
 % 
 % %TODO: do whatever you want with the results
-% disp('The following iterations succeeded:');
-% goodResults = find(bSuccess)
-% fprintf('And the result from iteration #%d is:\n',goodResults(1));
-% WGresults{goodResults(1)}
+% fprintf('%d iterations failed and could not be recovered\n',nLost);
+% bDone = false;
+% for j = 1:length(WGresults)
+%     for k = 1:length(WGresults{j})
+%         if (bSuccess{j}(k))
+%             fprintf('\nIteration #%d for sub-parameters set #%d succeeded!\n', k,j);
+% 
+%             disp('And the result was:');
+%             WGresults{j}{k}
+%             
+%             bDone = true;
+%             break;
+%         end
+%     end
+%     
+%     if (bDone)
+%         break;
+%     end
+% end
 

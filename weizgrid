@@ -2,5 +2,4 @@
 #$ -S /bin/bash
 
 #Written by Stav Yagev, 2013
-
 matlab2012a -nodisplay -r "global WGq; WGq ='$2'; $1; quit;"
