@@ -16,6 +16,8 @@ function [WGjob] = WGexec( varargin )
 %       NOTE: If WaitTillFinished is true, 1 job is dedicated to spawning the
 %           jobs and waiting on results. So in the above example 114 jobs
 %           will do the actual work.
+%       NOTE: WeizGrid may decide to use less actual jobs than your quota
+%           due to rounding.
 %   
 %   WorkFunc - The name of your function that does the work. It must have
 %       the following signature:
@@ -147,6 +149,8 @@ function [WGjob] = WGexec( varargin )
             iTotalK = iTotalK + WGjob.k(j);
         end
         
+        %if we are waiting then 1 job is dedicated to the aggregation
+        WGjob.nparallels = WGjob.nparallels - 1;
         
         for i=1:WGjob.nparallels
             

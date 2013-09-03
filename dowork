@@ -3,4 +3,4 @@
 
 #Written by Stav Yagev, 2013
 
-matlab2012a -nodisplay -r "load('~/.matlab/cluster_jobs/$1/$2_$3i'); workFunc=@$4; WGdowork; save('~/.matlab/cluster_jobs/$1/$2_$3o','WGres','mAssRng','bSuccess'); quit;"
+matlab2012a -nodisplay -r "addpath(genpath('~/WeizGrid')); load('~/.matlab/cluster_jobs/$1/$2_$3i'); workFunc=@$4; WGdowork; save('~/.matlab/cluster_jobs/$1/$2_$3o','WGres','mAssRng','bSuccess'); quit;"

@@ -5,7 +5,7 @@
 %   using WeizGrid. 
 %
 %   In this example we have 50 different values for parameters
-%   X and Y. For each set of values we run 50 tests which take
+%   X and Y. For each set of values we run 20 tests which take
 %   the average of X and Y and check which prime factors the
 %   result has in common with a random integer.
 %   
@@ -42,7 +42,7 @@ end
 %TODO: replace 'calcPrimes' with your private work function, and change the
 %       rest of the parameters as you see fit
 tic;
-WGjob = WGexec('nparallels', 3, 'Name', 'ParallelCracker', ...
+WGjob = WGexec('nparallels', 100, 'Name', 'PCRK', ...
     'WorkFunc', 'calcPrimes', 'LocalDebug', false, 'GlobalParams', WGglobalParam, ...
     'SubParams', WGsubParam, 'RngShuffle', true, 'WaitTillFinished', true); 
     %Please right click on 'WGexec' for help on this function

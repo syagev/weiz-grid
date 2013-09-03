@@ -50,7 +50,7 @@ function [WGtotalRes, bTotalSuccess, nLost] = WGgetResults( WGjob, varargin )
 %   WGjob - A structure constructed by YOU the following way:
 %       WGjob.k = is a Jx1 vector containing the original k values for each
 %           sub-parameters set
-%       WGjob.nparallels = the original number of parallels the work was split into
+%       WGjob.nparallels = should be equal to what you used when calling WGexec
 %       WGjob.sName = the exact name used for the original job
 %
 %   Also specifiy the option 'LocalFolder' with the path to where you put
@@ -88,7 +88,12 @@ function [WGtotalRes, bTotalSuccess, nLost] = WGgetResults( WGjob, varargin )
         WGtotalRes = cell(WGjob.j,1);
         bTotalSuccess = cell(WGjob.j,1);
         iTotalK = sum(WGjob.k);
-
+        
+        %if we are recovering, then it is defnitely from a case where
+        %someone used the WaitTillFinished option. so active nparallels is
+        %1 less than that specified
+        WGjob.nparallels = WGjob.nparallels - 1;
+        
         %collect results
         for i=1:WGjob.nparallels
             if (~bLocalFolder)
