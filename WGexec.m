@@ -150,7 +150,9 @@ function [WGjob] = WGexec( varargin )
         end
         
         %if we are waiting then 1 job is dedicated to the aggregation
-        WGjob.nparallels = WGjob.nparallels - 1;
+        if (bWait)
+            WGjob.nparallels = WGjob.nparallels - 1;
+        end
         
         for i=1:WGjob.nparallels
             
