@@ -9,7 +9,7 @@
 
 
 #this cleans up temp files from previous jobs (all of this is optional)
-rm -f ~/.matlab/cluster_jobs/$1/*
+rm -f ~/.matlab/cluster_jobs/$3/*
 rm -f *.e*
 rm -f *.o*
 

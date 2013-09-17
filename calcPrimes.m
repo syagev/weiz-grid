@@ -30,5 +30,5 @@ function [WGres,bSuccess] = calcPrimes(WGglobalParam, WGsubParam, j, k)
     %"wrong" in the aggregation stage. For the sake of the example, lets
     %say we don't want to include pairs of numbers that are co-prime
     bSuccess = ~isempty(WGres);
-    
+        
 end

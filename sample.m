@@ -51,7 +51,7 @@ WGjob = WGexec('nparallels', 100, 'Name', 'PCRK', ...
 
 %STEP 3: Aggregate results:
 
-[WGresults, bSuccess] = WGgetResults(WGjob);    %right click on 'WGgetResults' for help
+[WGresults, bSuccess] = WGgetResults(WGjob, 'Flatten', true);    %right click on 'WGgetResults' for help
 
 %TODO: do whatever you want with the results
 fprintf('Done in %d seconds\n',round(toc));
@@ -85,14 +85,15 @@ end
 %copy all the files from the following UNIX directory to somewhere on your PC
 %   ~/.matlab/cluster_jobs/yourq.q/
 
-% sTempDir = 'S:\\Expendable\\Temp';   %this is where you saved the files
+% sTempDir = 'S:\\Expendable\\Temp\\D';   %this is where you saved the files
 % 
 % %call the get results (which will return immediatley) with the local
 % %option. We need to specify some extra information since the original job
 % %was lost
+% WGjob.j = length(WGsubParam);       %original number of iterations
 % WGjob.k(1:length(WGsubParam)) = WGsubParam(:).k;    %the original k values for each sub-parameters set
-% WGjob.nparallels = 3;               %orignal number of parallels the job was split to
-% WGjob.sName = 'ParallelCracker';    %the original job's name
+% WGjob.nparallels = 100;               %orignal number of parallels the job was split to
+% WGjob.sName = 'PCRK';    %the original job's name
 % [WGresults, bSuccess, nLost] = WGgetResults(WGjob, 'LocalFolder', sTempDir);
 % 
 % %TODO: do whatever you want with the results

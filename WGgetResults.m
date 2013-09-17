@@ -92,7 +92,14 @@ function [WGtotalRes, bTotalSuccess, nLost] = WGgetResults( WGjob, varargin )
         %if we are recovering, then it is defnitely from a case where
         %someone used the WaitTillFinished option. so active nparallels is
         %1 less than that specified
-        WGjob.nparallels = WGjob.nparallels - 1;
+        if (bLocalFolder)
+            WGjob.nparallels = WGjob.nparallels - 1;
+        end
+        
+        for j = 1:WGjob.j
+            WGtotalRes{j} = cell(WGjob.k(j),1);
+            bTotalSuccess{j} = false(WGjob.k(j),1);
+        end 
         
         %collect results
         for i=1:WGjob.nparallels
@@ -101,11 +108,6 @@ function [WGtotalRes, bTotalSuccess, nLost] = WGgetResults( WGjob, varargin )
                     WGjob.q,WGjob.sName,i);
             else
                 fname = sprintf([sLocalFolder '\\%s_%do.mat'],WGjob.sName,i);
-            end
-            
-            for j = 1:WGjob.j
-                WGtotalRes{j} = cell(WGjob.k(j),1);
-                bTotalSuccess{j} = false(WGjob.k(j),1);
             end
             
             if (exist(fname, 'file'))
