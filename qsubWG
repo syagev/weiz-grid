@@ -17,4 +17,4 @@ rm -f *.o*
 #this invokes the main job, if you decide to this yourself
 #make sure you include the -V and -cwd options when you qsub
 
-qsub -cwd -q $3 -V -N $1 ~/WeizGrid/weizgrid $2 $3
+qsub -o $1.o -e $1.e -cwd -q $3 -V -N $1 ~/WeizGrid/weizgrid $2 $3
