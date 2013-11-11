@@ -58,6 +58,12 @@ function [WGjob] = WGexec( varargin )
 %       random numbers. To remedy this, set this to true so that
 %       rng('shuffle') is invoked on every piece of parallel work.
 %
+%   Que (Default: queue specified with qsubWG) - Setting this parameter
+%       with a name of a queue can optionally submit the child jobs to a
+%       different queue than that specified with the qsubWG UNIX command. This
+%       way for example child jobs can run on a "cheap" low-memory and short-length 
+%       while the aggregation can be done on high-memory queue.
+%
 %   Return value: The functions returns a structure identifying the job
 %       which can be used when calling WGgetResults.
 %
@@ -97,6 +103,8 @@ function [WGjob] = WGexec( varargin )
                 bWait = value;
             case 'RngShuffle'
                 bRngShuffle = value;
+            case 'Que'
+                WGjob.q = value;
             otherwise
                 error(['Unknown option "' name]);
         end
@@ -153,7 +161,7 @@ function [WGjob] = WGexec( varargin )
         if (bWait)
             WGjob.nparallels = WGjob.nparallels - 1;
         end
-        
+             
         for i=1:WGjob.nparallels
             
             %caluclate the correct k-range
@@ -163,13 +171,13 @@ function [WGjob] = WGexec( varargin )
                 
             %save the simulation data to a unique file
             WGsubParams = WGallSubParams(mAssRng(1,1):mAssRng(end,1)); %#ok<NASGU>
-            save(sprintf('~/.matlab/cluster_jobs/%s/%s_%di',WGq,WGjob.sName,i), ...
-                'WGsubParams', 'WGglobalParams', 'mAssRng', 'bRngShuffle');
+            save(sprintf('~/.matlab/cluster_jobs/%s/%s_%di',WGjob.q,WGjob.sName,i), ...
+                'WGglobalParams', 'bRngShuffle', 'WGsubParams', 'mAssRng');
             
             %submit a job for this sub simulation to SGE
             system(sprintf(['qsub -o %s_%d.o -e %s_%d.e -cwd -q %s -V -N %s_%d ' ...
                 '~/WeizGrid/dowork %s %s %d %s'], ...
-                WGjob.sName, i, WGjob.sName, i, WGq, WGjob.sName, i, WGq, ...
+                WGjob.sName, i, WGjob.sName, i, WGjob.q, WGjob.sName, i, WGjob.q, ...
                 WGjob.sName, i, sWorkFunc));
             
             %less maybe enough due to rounding
@@ -182,7 +190,7 @@ function [WGjob] = WGexec( varargin )
             %use an empty job to wait for all sub-simulations to finish
             pause(10);
             system(sprintf('qsub -cwd -q %s -V -sync yes -hold_jid "%s_*" -N %s_w ~/WeizGrid/empty', ...
-                WGq, WGjob.sName, WGjob.sName));
+                WGjob.q, WGjob.sName, WGjob.sName));
         end
     end
     

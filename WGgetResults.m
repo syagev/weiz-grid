@@ -48,6 +48,7 @@ function [WGtotalRes, bTotalSuccess, nLost] = WGgetResults( WGjob, varargin )
 %   results again:
 %   
 %   WGjob - A structure constructed by YOU the following way:
+%       WGjob.j = the total number of jobs (length of your original subParam array)
 %       WGjob.k = is a Jx1 vector containing the original k values for each
 %           sub-parameters set
 %       WGjob.nparallels = should be equal to what you used when calling WGexec
@@ -107,7 +108,11 @@ function [WGtotalRes, bTotalSuccess, nLost] = WGgetResults( WGjob, varargin )
                 fname = sprintf('~/.matlab/cluster_jobs/%s/%s_%do.mat', ...
                     WGjob.q,WGjob.sName,i);
             else
-                fname = sprintf([sLocalFolder '\\%s_%do.mat'],WGjob.sName,i);
+                if (ispc)
+                    fname = sprintf([sLocalFolder '\\%s_%do.mat'],WGjob.sName,i);
+                else
+                    fname = sprintf([sLocalFolder '/%s_%do.mat'],WGjob.sName,i);
+                end
             end
             
             if (exist(fname, 'file'))

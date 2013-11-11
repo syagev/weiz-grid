@@ -1,0 +1,4 @@
+#!/bin/bash
+#$ -S /bin/bash
+
+/usr/wisdom/matlabR2013a/bin/matlab -nodisplay -r "$1; quit;"
