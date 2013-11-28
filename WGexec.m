@@ -64,6 +64,10 @@ function [WGjob] = WGexec( varargin )
 %       way for example child jobs can run on a "cheap" low-memory and short-length 
 %       while the aggregation can be done on high-memory queue.
 %
+%   Mail (Default: empty) - If this parameter is set with an e-mail address
+%       then the e-mail is notified once the job is done (in Debug mode)
+%       this option is ignored.
+%
 %   Return value: The functions returns a structure identifying the job
 %       which can be used when calling WGgetResults.
 %
@@ -76,6 +80,7 @@ function [WGjob] = WGexec( varargin )
     bWait = true;
     WGglobalParams = []; %#ok<NASGU>
     bRngShuffle = true;
+    sEmail = [];
         
     iMandatory = 0;
     for i = 1 : 2 : length(varargin)
@@ -105,6 +110,8 @@ function [WGjob] = WGexec( varargin )
                 bRngShuffle = value;
             case 'Que'
                 WGjob.q = value;
+            case 'Mail'
+                sEmail = [' -m ea -M ' value];
             otherwise
                 error(['Unknown option "' name]);
         end
@@ -175,7 +182,7 @@ function [WGjob] = WGexec( varargin )
                 'WGglobalParams', 'bRngShuffle', 'WGsubParams', 'mAssRng');
             
             %submit a job for this sub simulation to SGE
-            system(sprintf(['qsub -o %s_%d.o -e %s_%d.e -cwd -q %s -V -N %s_%d ' ...
+            system(sprintf(['qsub -o out/%s_%d.o -e out/%s_%d.e -cwd -q %s -V -N %s_%d ' ...
                 '~/WeizGrid/dowork %s %s %d %s'], ...
                 WGjob.sName, i, WGjob.sName, i, WGjob.q, WGjob.sName, i, WGjob.q, ...
                 WGjob.sName, i, sWorkFunc));
@@ -186,12 +193,17 @@ function [WGjob] = WGexec( varargin )
             end
         end
         
+        %use an empty job to wait for all sub-simulations to finish, if
+        %bWait is enabled then add syncing
         if (bWait)
-            %use an empty job to wait for all sub-simulations to finish
-            pause(10);
-            system(sprintf('qsub -cwd -q %s -V -sync yes -hold_jid "%s_*" -N %s_w ~/WeizGrid/empty', ...
-                WGjob.q, WGjob.sName, WGjob.sName));
+            sSync = '-sync yes';
+        else
+            sSync = [];
         end
+        pause(10);
+        system(sprintf('qsub -cwd -o /dev/null -e /dev/null -q %s %s -V %s -hold_jid "%s_*" -N %s_w ~/WeizGrid/empty', ...
+            WGjob.q, sEmail, sSync, WGjob.sName, WGjob.sName));
+                
     end
     
 end

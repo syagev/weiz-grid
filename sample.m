@@ -42,8 +42,8 @@ end
 %TODO: replace 'calcPrimes' with your private work function, and change the
 %       rest of the parameters as you see fit
 tic;
-WGjob = WGexec('nparallels', 100, 'Name', 'PCRK', ...
-    'WorkFunc', 'calcPrimes', 'LocalDebug', false, 'GlobalParams', WGglobalParam, ...
+WGjob = WGexec('nparallels', 40, 'Name', 'PCRK', 'Mail', 'syagev@gmail.com', ...
+    'WorkFunc', 'calcPrimes', 'LocalDebug', ispc, 'GlobalParams', WGglobalParam, ...
     'SubParams', WGsubParam, 'RngShuffle', true, 'WaitTillFinished', true); 
     %Please right click on 'WGexec' for help on this function
 
@@ -51,7 +51,7 @@ WGjob = WGexec('nparallels', 100, 'Name', 'PCRK', ...
 
 %STEP 3: Aggregate results:
 
-[WGresults, bSuccess] = WGgetResults(WGjob, 'Flatten', true);    %right click on 'WGgetResults' for help
+[WGresults, bSuccess] = WGgetResults(WGjob, 'Flatten', false);    %right click on 'WGgetResults' for help
 
 %TODO: do whatever you want with the results
 fprintf('Done in %d seconds\n',round(toc));

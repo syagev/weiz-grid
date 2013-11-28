@@ -1,2 +1,2 @@
-cd ~/SimiMotion
-~/WeizGrid/qsubWG batchTest batchTest all.q
+cd ~/WeizGrid
+~/WeizGrid/qsubWG sample sample all.q
